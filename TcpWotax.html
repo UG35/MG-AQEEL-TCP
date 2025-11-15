@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from wotax-tcpweb-updated.vercel.app/TcpWotax by HTTrack Website Copier/3.x [XR&CO'2017], Tue, 11 Nov 2025 17:40:52 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ULTIGER IOS - TCP CONTROL</title>
+  <link href="../external.html?link=https://fonts.googleapis.com/css2?family=Share+Tech+Mono&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style/links/donate.css">
+</head>
+<body>
+  <div class="cursor-tracker"></div>
+  <div class="matrix-bg"></div>
+
+  <!-- Boot Terminal -->
+  <div class="boot-screen" id="boot">
+    <pre class="boot-text" id="boot-text"></pre>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="nav-tabs" id="nav-tabs" style="display: none;">
+    <button class="tab-btn active" onclick="showTab('home')">Home</button>
+    <button class="tab-btn" onclick="showTab('added-users')">Added Users</button>
+  </div>
+
+  <!-- Main Donate Content -->
+  <div class="donate-container" id="donate-content">
+    <!-- Home Tab Content -->
+    <div id="home-tab" class="tab-content active">
+      <h1 class="title">[ULTIGER IOS TCP PANEL]</h1>
+      <p class="subtitle">Welcome to MG AQEEL Tcp Control panel, from here you can control your bot directly</p>
+
+    <div class="donate-grid">
+      <!-- TCP Add Friend -->
+      <div class="donate-card">
+        <h2>Tcp add friend</h2>
+        <p>Write your guest uid and password and your friend or your uid</p>
+        <div class="input-group">
+          <input type="text" id="add-uid" placeholder="UID" class="tcp-input">
+          <input type="password" id="add-password" placeholder="Password" class="tcp-input">
+          <input type="text" id="add-friend-uid" placeholder="Friend UID to Add" class="tcp-input">
+          <input type="text" id="add-region" placeholder="Region" class="tcp-input"> <!-- New -->
+        </div>
+
+        <button id="send-add-btn" onclick="sendAddRequest()">Send</button>
+        <p id="add-response" class="response-msg"></p>
+      </div>
+
+      <!-- TCP Remove Friend -->
+      <div class="donate-card">
+        <h2>Tcp remove friend</h2>
+        <p>Write your guest id and password and your friend or your uid</p>
+        <div class="input-group">
+          <input type="text" id="remove-uid" placeholder="UID" class="tcp-input">
+          <input type="password" id="remove-password" placeholder="Password" class="tcp-input">
+          <input type="text" id="remove-friend-uid" placeholder="Friend UID to Remove" class="tcp-input">
+          <input type="text" id="remove-region" placeholder="Region" class="tcp-input"> <!-- New -->
+        </div>
+
+        <button id="send-remove-btn" onclick="sendRemoveRequest()">Send</button>
+        <p id="remove-response" class="response-msg"></p>
+      </div>
+
+      <!-- State Added UIDs -->
+      <div class="donate-card">
+        <h2>State Added uids</h2>
+        <p>For seeing how many uids added</p>
+        <button onclick="showUidState()">Show</button>
+        <div id="uid-state-list" class="uid-state-container"></div>
+      </div>
+
+      <!-- Tcp Join Clan -->
+      <div class="donate-card">
+        <h2>Tcp Join Clan</h2>
+        <p>Join any TCP bot to your guild automatically</p>
+        <div class="input-group">
+          <input type="text" id="join-token" placeholder="Bot Token" class="tcp-input">
+          <input type="text" id="join-guild-id" placeholder="Guild ID" class="tcp-input">
+          <input type="text" id="join-region" placeholder="Region" class="tcp-input">
+        </div>
+        <button id="send-join-btn" onclick="sendJoinClanRequest()">Join Clan</button>
+        <p id="join-response" class="response-msg"></p>
+      </div>
+
+      <!-- Send Emote -->
+      <div class="donate-card">
+        <h2>Send Emote</h2>
+        <p>Use emote in game</p>
+        <div class="input-group">
+          <input type="text" id="emote-uid" placeholder="UID" class="tcp-input">
+          <input type="number" id="emote-number" placeholder="Emote Number (1-385)" min="1" max="385" class="tcp-input">
+          <input type="text" id="emote-teamcode" placeholder="Team Code" class="tcp-input">
+        </div>
+        <button id="send-emote-btn" onclick="sendEmoteRequest()">Send Emote</button>
+        <p id="emote-response" class="response-msg"></p>
+      </div>
+
+      <!-- State Added UIDs Panel -->
+      <!-- Panel Users Count -->
+      <div class="donate-card">
+        <h2>USERS COUNT</h2>
+        <p>Show how many users are using it</p>
+        <div id="panel-users-display" class="panel-users-container"></div>
+      </div>
+    </div>
+
+    <p class="note"><br>* Thanks for using Our service! if you need me im free for you! <br><br> Dev: Wotax! </br></br></br></p>
+    </div>
+
+    <!-- Added Users Tab Content -->
+    <div id="added-users-tab" class="tab-content">
+      <div class="terminal">
+        <h1 class="title">[Added Users Panel]</h1>
+        <p class="subtitle">> Enter access key to view added UIDs</p>
+
+        <div id="key-auth-section">
+          <label>Access Key:</label>
+          <input type="password" id="access-key" placeholder="Enter key..." class="tcp-input">
+          <button onclick="authenticateKey()">Authenticate</button>
+          <p id="auth-message" class="response-msg"></p>
+        </div>
+
+        <div id="added-uids-section" style="display: none;">
+          <h2>Added UIDs</h2>
+          <p>UIDs that were successfully added through the panel</p>
+          <div id="added-uids-list" class="added-uids-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script/donate/donate.js"></script>
+  <script>
+
+    async function fetchWithTimeout(url, options = {}, timeout = 40000) { // 40 seconds
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Request timed out')), timeout);
+    fetch(url, options)
+      .then(response => {
+        clearTimeout(timer);
+        resolve(response);
+      })
+      .catch(err => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}
+
+
+    const BIN_ID = "6905c9b4d0ea881f40cb4e57";
+const MASTER_KEY = "$2a$10$DzT8NJG1jvC.sPGXExG2se9Sp.9c/oIP2WpnxviwTi.MAiy9/Y5ka";
+
+function getDeviceId() {
+  let deviceId = localStorage.getItem('deviceId');
+  if (!deviceId) {
+    deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('deviceId', deviceId);
+  }
+  return deviceId;
+}
+
+async function addPanelUser() {
+  const deviceId = getDeviceId();
+  const storedDevices = localStorage.getItem('addedDevices') ? JSON.parse(localStorage.getItem('addedDevices')) : [];
+
+  // Only count once per device
+  if (!storedDevices.includes(deviceId)) {
+    storedDevices.push(deviceId);
+    localStorage.setItem('addedDevices', JSON.stringify(storedDevices));
+
+    // Fetch current global count from jsonbin
+    let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: { "X-Master-Key": MASTER_KEY }
+    });
+    let data = await res.json();
+    let count = data.record.usersCount || 0;
+
+    // Increment
+    count++;
+
+    // Save back updated count
+    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": MASTER_KEY
+      },
+      body: JSON.stringify({ usersCount: count })
+    });
+
+    showPanelUsers(count);
+  } else {
+    // Already counted, just fetch latest value
+    let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: { "X-Master-Key": MASTER_KEY }
+    });
+    let data = await res.json();
+    showPanelUsers(data.record.usersCount || 0);
+  }
+}
+
+function showPanelUsers(count) {
+  const container = document.getElementById('panel-users-display');
+  let html = `<div class="panel-users-count">
+    <div class="user-count-number">${count}</div>
+    <div class="user-count-label">${count === 1 ? 'User' : 'Users'}</div>
+  </div>`;
+  container.innerHTML = html;
+  container.style.display = 'block';
+}
+
+// Run on page load
+window.addEventListener('load', addPanelUser);
+
+    // Tab switching
+    function showTab(tabName) {
+      const tabs = document.querySelectorAll('.tab-content');
+      const btns = document.querySelectorAll('.tab-btn');
+
+      tabs.forEach(tab => tab.classList.remove('active'));
+      btns.forEach(btn => btn.classList.remove('active'));
+
+      if (tabName === 'home') {
+        document.getElementById('home-tab').classList.add('active');
+        btns[0].classList.add('active');
+      } else if (tabName === 'added-users') {
+        document.getElementById('added-users-tab').classList.add('active');
+        btns[1].classList.add('active');
+      }
+    }
+
+    // Key authentication
+    function authenticateKey() {
+      const keyInput = document.getElementById('access-key');
+      const authMsg = document.getElementById('auth-message');
+      const key = keyInput.value.trim();
+
+      if (key === 'wotax@5@5') {
+        authMsg.style.color = '#00ff88';
+        authMsg.textContent = 'Access Granted';
+
+        setTimeout(() => {
+          document.getElementById('key-auth-section').style.display = 'none';
+          document.getElementById('added-uids-section').style.display = 'block';
+          displayAddedUids();
+        }, 1000);
+      } else {
+        authMsg.style.color = '#ff0033';
+        authMsg.textContent = 'Access Denied';
+      }
+    }
+
+    // Display added UIDs with remove buttons
+    function displayAddedUids() {
+      const state = getUidState();
+      const container = document.getElementById('added-uids-list');
+
+      // Filter only added UIDs (not removed)
+      const addedUids = state.filter(item => item.action === 'added');
+
+      if (addedUids.length === 0) {
+        container.innerHTML = '<p class="no-data">No UIDs added yet</p>';
+        return;
+      }
+
+      let html = '<div class="uid-list">';
+      addedUids.forEach((item, index) => {
+        html += `
+          <div class="uid-item">
+            <span class="uid-text">UID ${item.uid} - added ✓</span>
+            <button class="remove-btn" onclick="removeUidFromList('${item.uid}', ${index})">Remove</button>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      container.innerHTML = html;
+    }
+
+    // Remove UID from friend list via API
+    async function removeUidFromList(uid, index) {
+      const removeBtn = event.target;
+      removeBtn.textContent = 'Removing...';
+      removeBtn.disabled = true;
+
+      // Get stored credentials (assuming they were used to add)
+      const state = getUidState();
+      const addedItems = state.filter(item => item.action === 'added');
+      const item = addedItems[index];
+
+      // Note: You'll need to store uid/password when adding to use here
+      // For now, we'll just remove from localStorage
+
+      try {
+        // Remove from localStorage
+        const newState = state.filter(s => !(s.uid === uid && s.action === 'added'));
+        localStorage.setItem('uidState', JSON.stringify(newState));
+
+        removeBtn.textContent = 'Removed';
+        setTimeout(() => {
+          displayAddedUids();
+        }, 1000);
+      } catch (error) {
+        removeBtn.textContent = 'Failed';
+        removeBtn.disabled = false;
+      }
+    }
+
+    // Store successful operations
+    function getUidState() {
+      const state = localStorage.getItem('uidState');
+      return state ? JSON.parse(state) : [];
+    }
+
+    function saveUidState(uid, action) {
+      const state = getUidState();
+      state.push({ uid, action, timestamp: Date.now() });
+      localStorage.setItem('uidState', JSON.stringify(state));
+    }
+
+    function showUidState() {
+      const state = getUidState();
+      const container = document.getElementById('uid-state-list');
+
+      if (state.length === 0) {
+        container.innerHTML = '<p class="no-data">No UIDs processed yet</p>';
+        container.style.display = 'block';
+        return;
+      }
+
+      let html = '<div class="uid-list">';
+      state.forEach(item => {
+        html += `<div class="uid-item">${item.uid} - ${item.action}</div>`;
+      });
+      html += '</div>';
+
+      container.innerHTML = html;
+      container.style.display = 'block';
+    }
+
+    async function sendAddRequest() {
+  const uid = document.getElementById('add-uid').value.trim();
+  const password = document.getElementById('add-password').value.trim();
+  const add = document.getElementById('add-friend-uid').value.trim();
+  const region = document.getElementById('add-region').value.trim(); // New
+  const responseEl = document.getElementById('add-response');
+
+  if (!uid || !password || !add || !region) {
+    responseEl.textContent = 'Please fill all fields';
+    responseEl.style.color = '#ff0033';
+    return;
+  }
+
+  responseEl.textContent = 'Sending...';
+  responseEl.style.color = '#00ffe0';
+
+  // Send request in background without waiting
+  fetch(`https://addfriendmain-wotaxxdev-api.vercel.app/add?uid=${uid}&password=${password}&adduid=${add}&region=${region}`)
+    .then(response => response.json())
+    .then(data => console.log('Add friend response:', data))
+    .catch(error => console.log('Add friend error:', error));
+
+  // Auto-show success after 5 seconds
+  setTimeout(() => {
+    responseEl.textContent = 'Success';
+    responseEl.style.color = '#00ff88';
+    saveUidState(add, 'added');
+  }, 5000);
+}
+
+
+    async function sendRemoveRequest() {
+  const uid = document.getElementById('remove-uid').value.trim();
+  const password = document.getElementById('remove-password').value.trim();
+  const remove = document.getElementById('remove-friend-uid').value.trim();
+  const region = document.getElementById('remove-region').value.trim(); // New
+  const responseEl = document.getElementById('remove-response');
+
+  if (!uid || !password || !remove || !region) {
+    responseEl.textContent = 'Please fill all fields';
+    responseEl.style.color = '#ff0033';
+    return;
+  }
+
+  responseEl.textContent = 'Sending...';
+  responseEl.style.color = '#00ffe0';
+
+  // Send request in background without waiting
+  fetch(`https://addfriendmain-wotaxxdev-api.vercel.app/remove?uid=${uid}&password=${password}&adduid=${remove}&region=${region}`)
+    .then(response => response.json())
+    .then(data => console.log('Remove friend response:', data))
+    .catch(error => console.log('Remove friend error:', error));
+
+  // Auto-show success after 5 seconds
+  setTimeout(() => {
+    responseEl.textContent = 'Success';
+    responseEl.style.color = '#00ff88';
+    saveUidState(remove, 'removed');
+  }, 5000);
+}
+
+async function sendJoinClanRequest() {
+  const token = document.getElementById('join-token').value.trim();
+  const clanid = document.getElementById('join-guild-id').value.trim();
+  const region = document.getElementById('join-region').value.trim();
+  const responseEl = document.getElementById('join-response');
+
+  if (!token || !clanid || !region) {
+    responseEl.textContent = 'Please fill all fields';
+    responseEl.style.color = '#ff0033';
+    return;
+  }
+
+  responseEl.textContent = 'Sending...';
+  responseEl.style.color = '#00ffe0';
+
+  // Send request in background without waiting
+  fetch(`https://join-clan-wotaxxdev-api.vercel.app/join?token=${encodeURIComponent(token)}&clanid=${encodeURIComponent(clanid)}&region=${encodeURIComponent(region)}`)
+    .then(response => response.json())
+    .then(data => console.log('Join clan response:', data))
+    .catch(error => console.log('Join clan error:', error));
+
+  // Auto-show success after 5 seconds
+  setTimeout(() => {
+    responseEl.textContent = 'Success';
+    responseEl.style.color = '#00ff88';
+  }, 5000);
+}
+
+// Load emotes from JSON
+let emotesData = null;
+async function loadEmotes() {
+  try {
+    const response = await fetch('emotes.json');
+    const data = await response.json();
+    emotesData = data.emotes;
+    console.log('Emotes loaded successfully:', emotesData.length);
+  } catch (error) {
+    console.error('Failed to load emotes:', error);
+    alert('Error loading emotes data. Please refresh the page.');
+  }
+}
+
+// Send emote request
+async function sendEmoteRequest() {
+  const uid = document.getElementById('emote-uid').value.trim();
+  const emoteNumber = parseInt(document.getElementById('emote-number').value.trim());
+  const teamcode = document.getElementById('emote-teamcode').value.trim();
+  const responseEl = document.getElementById('emote-response');
+
+  console.log('Emote request - UID:', uid, 'Number:', emoteNumber, 'Teamcode:', teamcode);
+
+  if (!uid || !emoteNumber || !teamcode) {
+    responseEl.textContent = 'Please fill all fields';
+    responseEl.style.color = '#ff0033';
+    return;
+  }
+
+  if (emoteNumber < 1 || emoteNumber > 385) {
+    responseEl.textContent = 'Emote number must be between 1-385';
+    responseEl.style.color = '#ff0033';
+    return;
+  }
+
+  // Ensure emotes are loaded
+  if (!emotesData || emotesData.length === 0) {
+    responseEl.textContent = 'Loading emotes...';
+    responseEl.style.color = '#ffaa00';
+    await loadEmotes();
+    if (!emotesData || emotesData.length === 0) {
+      responseEl.textContent = 'Failed to load emotes';
+      responseEl.style.color = '#ff0033';
+      return;
+    }
+  }
+
+  // Find the emote by number
+  const emote = emotesData.find(e => e.number === emoteNumber);
+  
+  console.log('Found emote:', emote);
+  
+  if (!emote) {
+    responseEl.textContent = 'Invalid emote number';
+    responseEl.style.color = '#ff0033';
+    return;
+  }
+
+  const emoteId = emote.id;
+  const apiUrl = `http://104.234.236.62:30151/join?uid1=${encodeURIComponent(uid)}&emote_id=${encodeURIComponent(emoteId)}&tc=${encodeURIComponent(teamcode)}`;
+  
+  console.log('Sending to API:', apiUrl);
+
+  responseEl.textContent = 'Sending...';
+  responseEl.style.color = '#00ffe0';
+
+  // Send request in background without waiting
+  fetch(apiUrl)
+    .then(response => {
+      console.log('API Response status:', response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log('Send emote response:', data);
+      responseEl.textContent = 'Sent!';
+      responseEl.style.color = '#00ff88';
+    })
+    .catch(error => {
+      console.log('Send emote error:', error);
+      responseEl.textContent = 'Sent!';
+      responseEl.style.color = '#00ff88';
+    });
+}
+
+// Load emotes when page loads
+window.addEventListener('load', loadEmotes);
+
+// 3D Cursor Tracker
+const cursorTracker = document.querySelector('.cursor-tracker');
+let mouseX = 0, mouseY = 0;
+let trackerX = 0, trackerY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+function animateTracker() {
+  const dx = mouseX - trackerX;
+  const dy = mouseY - trackerY;
+  
+  trackerX += dx * 0.15;
+  trackerY += dy * 0.15;
+  
+  cursorTracker.style.left = trackerX + 'px';
+  cursorTracker.style.top = trackerY + 'px';
+  
+  requestAnimationFrame(animateTracker);
+}
+
+animateTracker();
+
+// Interactive 3D Grid Lines with Breaking Effect
+const matrixBg = document.querySelector('.matrix-bg');
+const gridLines = [];
+const gridSize = 40;
+const numLinesX = Math.ceil(window.innerWidth / gridSize) + 4;
+const numLinesY = Math.ceil(window.innerHeight / gridSize) + 4;
+
+// Create grid lines with segments for breaking effect
+for (let i = 0; i < numLinesX; i++) {
+  const line = document.createElement('div');
+  line.style.position = 'absolute';
+  line.style.left = (i * gridSize) + 'px';
+  line.style.top = '0';
+  line.style.width = '2px';
+  line.style.height = '100%';
+  line.style.background = 'linear-gradient(180deg, rgba(0, 191, 255, 0.15), rgba(0, 150, 255, 0.08))';
+  line.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  line.style.transformOrigin = 'center';
+  line.dataset.originalX = i * gridSize;
+  line.dataset.type = 'vertical';
+  matrixBg.appendChild(line);
+  gridLines.push(line);
+}
+
+for (let i = 0; i < numLinesY; i++) {
+  const line = document.createElement('div');
+  line.style.position = 'absolute';
+  line.style.left = '0';
+  line.style.top = (i * gridSize) + 'px';
+  line.style.width = '100%';
+  line.style.height = '2px';
+  line.style.background = 'linear-gradient(90deg, rgba(0, 191, 255, 0.15), rgba(0, 150, 255, 0.08))';
+  line.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  line.style.transformOrigin = 'center';
+  line.dataset.originalY = i * gridSize;
+  line.dataset.type = 'horizontal';
+  matrixBg.appendChild(line);
+  gridLines.push(line);
+}
+
+// Make grid lines scatter and break apart from cursor
+let lastMouseX = 0, lastMouseY = 0;
+document.addEventListener('mousemove', (e) => {
+  const velocityX = e.clientX - lastMouseX;
+  const velocityY = e.clientY - lastMouseY;
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+  
+  gridLines.forEach(line => {
+    const isVertical = line.dataset.type === 'vertical';
+    const linePos = isVertical ? parseFloat(line.dataset.originalX) : parseFloat(line.dataset.originalY);
+    const cursorPos = isVertical ? e.clientX : e.clientY;
+    
+    const distance = Math.abs(cursorPos - linePos);
+    const maxDistance = 200;
+    
+    if (distance < maxDistance) {
+      const force = Math.pow((maxDistance - distance) / maxDistance, 2);
+      const direction = cursorPos > linePos ? -1 : 1;
+      const velocity = isVertical ? Math.abs(velocityX) : Math.abs(velocityY);
+      const boost = Math.min(velocity * 0.3, 15);
+      
+      const displacement = (force * (37.5 + boost)) * direction;
+      const rotation = force * 11.25 * direction;
+      const scale = 1 - (force * 0.225);
+      const opacity = 1 - (force * 0.45);
+      
+      if (isVertical) {
+        line.style.transform = `translateX(${displacement}px) rotate(${rotation}deg) scaleY(${scale})`;
+      } else {
+        line.style.transform = `translateY(${displacement}px) rotate(${rotation}deg) scaleX(${scale})`;
+      }
+      
+      line.style.opacity = opacity;
+      line.style.boxShadow = `0 0 ${force * 20}px rgba(0, 191, 255, ${force * 0.5})`;
+    } else {
+      line.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
+      line.style.opacity = '1';
+      line.style.boxShadow = 'none';
+    }
+  });
+});
+
+// Scale cursor on interactive elements
+document.querySelectorAll('.donate-card, .tab-btn, button').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursorTracker.style.transform = 'translate(-50%, -50%) scale(1.5)';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursorTracker.style.transform = 'translate(-50%, -50%) scale(1)';
+  });
+});
+
+// Ensure inputs are clickable and typeable
+document.querySelectorAll('.tcp-input, input').forEach(input => {
+  input.style.pointerEvents = 'auto';
+  input.style.cursor = 'text';
+  input.style.userSelect = 'text';
+});
+  </script>
+</body>
+
+<!-- Mirrored from wotax-tcpweb-updated.vercel.app/TcpWotax by HTTrack Website Copier/3.x [XR&CO'2017], Tue, 11 Nov 2025 17:40:54 GMT -->
+</html>
